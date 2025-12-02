@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Highway Map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<script>
+    const map = new maplibregl.Map({
+        container: 'map',
+        style: 'https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL', // Replace with your own key
+        center: [78.47, 17.38], // Centered on Hyderabad as a default
+        zoom: 7
+    });
+
+    map.on('load', async () => {
+        // The ID of the highway we want to display
+        const highwayId = '80f19926-2a83-43c4-9047-4d3662499b8b';
+
+        try {
+            // Fetch the GeoJSON data from our new backend endpoint
+            const response = await fetch(`/api/highways/${highwayId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const geojsonData = await response.json();
+
+            // Add the GeoJSON data as a source to the map
+            map.addSource('highway-route', {
+                'type': 'geojson',
+                'data': geojsonData
+            });
+
+            // Add a layer to visualize the highway route
+            map.addLayer({
+                'id': 'highway-layer',
+                'type': 'line',
+                'source': 'highway-route',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': '#FF0000', // Red color for the line
+                    'line-width': 4
+                }
+            });
+
+            // Fit the map to the bounds of the new layer
+            const allCoordinates = geojsonData.features[0].geometry.coordinates.flat(2);
+            const firstCoord = geojsonData.features[0].geometry.coordinates[0][0];
+            
+            const bounds = allCoordinates.reduce((bounds, coord) => {
+                return bounds.extend(coord);
+            }, new maplibregl.LngLatBounds(firstCoord, firstCoord));
+
+            map.fitBounds(bounds, {
+                padding: 50
+            });
+
+        } catch (error) {
+            console.error('Error fetching or displaying highway data:', error);
+            alert('Could not load highway data. See console for details.');
+        }
+    });
+</script>
+
+</body>
+</html>

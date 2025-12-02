@@ -1,0 +1,92 @@
+# Compiled class file
+highwaymetricBE/*.class
+
+# Log file
+highwaymetricBE/*.log
+
+# BlueJ files
+highwaymetricBE/*.ctxt
+
+# Mobile Tools for Java (J2ME)
+highwaymetricBE/.mtj.tmp/
+
+# Package Files #
+highwaymetricBE/*.jar
+highwaymetricBE/*.war
+highwaymetricBE/*.nar
+highwaymetricBE/*.ear
+highwaymetricBE/*.zip
+highwaymetricBE/*.tar.gz
+highwaymetricBE/*.rar
+
+# virtual machine crash logs
+highwaymetricBE/hs_err_pid*
+
+# Maven
+highwaymetricBE/target/
+highwaymetricBE/pom.xml.tag
+highwaymetricBE/pom.xml.releaseBackup
+highwaymetricBE/pom.xml.versionsBackup
+highwaymetricBE/pom.xml.next
+highwaymetricBE/release.properties
+highwaymetricBE/dependency-reduced-pom.xml
+highwaymetricBE/buildNumber.properties
+
+# VS Code
+highwaymetricBE/.vscode/
+highwaymetricBE/.DS_Store
+
+# Context files
+highwaymetricBE/QWEN.md
+highwaymetricBE/qwenfile.json
+highwaymetricBE/llm.md
+highwaymetricBE/osm_nh44_hyd_nagpur.json
+highwaymetricBE/osm_nh44_test.json
+
+# Node
+highwaymetricFE/node_modules/
+highwaymetricFE/npm-debug.log*
+highwaymetricFE/yarn-debug.log*
+highwaymetricFE/yarn-error.log*
+highwaymetricFE/pnpm-debug.log*
+
+# Next.js build output
+highwaymetricFE/.next/
+highwaymetricFE/out/
+
+# Environment files
+highwaymetricFE/.env
+highwaymetricFE/.env.local
+highwaymetricFE/.env.*.local
+
+# Prisma (if used in FE folder)
+highwaymetricFE/prisma/*.db
+highwaymetricFE/prisma/migrations/*-shadow.db
+
+# Logs
+highwaymetricFE/logs/
+highwaymetricFE/*.log
+highwaymetricFE/*.log.*
+highwaymetricFE/debug.log
+highwaymetricFE/nohup.out
+
+# OS / Editor files (Arch Linux uses these too)
+highwaymetricFE/.DS_Store
+highwaymetricFE/Thumbs.db
+highwaymetricFE/*.swp
+highwaymetricFE/*.tmp
+
+# IDE / Editor folders
+highwaymetricFE/.vscode/
+highwaymetricFE/.idea/
+
+# QWEN / context files you listed
+highwaymetricFE/QWEN.md
+highwaymetricFE/qwenfile.json
+highwaymetricFE/llm.md
+highwaymetricFE/osm_nh44_hyd_nagpur.json
+highwaymetricFE/osm_nh44_test.json
+
+# Test output (optional)
+highwaymetricFE/coverage/
+

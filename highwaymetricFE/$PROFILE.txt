@@ -1,0 +1,3 @@
+function oracle {
+    ssh -i "C:\ssh key\ssh-key-2025-11-01.key" ubuntu@144.24.128.108
+}

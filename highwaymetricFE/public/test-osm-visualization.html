@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSM NH44 Visualization</title>
+    <script src="https://unpkg.com/maplibre-gl@5.10.0/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@5.10.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #controls { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            z-index: 1000; 
+            background: white; 
+            padding: 15px; 
+            border-radius: 5px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        button { 
+            display: block; 
+            margin: 5px 0; 
+            padding: 10px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        button:hover { background: #45a049; }
+        .legend { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 20px; 
+            z-index: 1000; 
+            background: white; 
+            padding: 10px; 
+            border-radius: 5px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .legend-item { 
+            display: flex; 
+            align-items: center; 
+            margin: 5px 0;
+        }
+        .legend-color { 
+            width: 20px; 
+            height: 5px; 
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="controls">
+        <h3>OSM NH44 Visualization</h3>
+        <p>Showing real NH44 geometry from OpenStreetMap (Hyderabad to Nagpur)</p>
+        <button id="loadData">Load NH44 Data</button>
+        <button id="fitBounds">Fit to Data</button>
+    </div>
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #FF0000;"></div>
+            <span>NH44 (Real OSM Data)</span>
+        </div>
+    </div>
+
+    <script>
+        // Initialize map
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://tiles.stadiamaps.com/styles/osm_bright.json',
+            center: [78.4867, 17.3850], // Hyderabad
+            zoom: 7
+        });
+
+        map.addControl(new maplibregl.NavigationControl());
+
+        // Add data loading functionality
+        document.getElementById('loadData').addEventListener('click', async function() {
+            try {
+                // Load the OSM data we fetched by creating it as a JavaScript variable
+                // (since fetching local files doesn't work in most browsers when opening file:// URLs)
+                const osmDataText = await fetch('osm_nh44_hyd_nagpur.json').then(response => response.text());
+                const highways = JSON.parse(osmDataText);
+                
+                // Create GeoJSON feature collection
+                const features = highways.map(hw => {
+                    return {
+                        type: 'Feature',
+                        properties: {
+                            id: hw.id,
+                            name: hw.name,
+                            ref: hw.ref,
+                            ...hw.properties
+                        },
+                        geometry: hw.geometry
+                    };
+                });
+                
+                const geojson = {
+                    type: 'FeatureCollection',
+                    features: features
+                };
+                
+                // Remove existing source and layer if they exist
+                if (map.getSource('highways')) {
+                    map.removeLayer('highways-layer');
+                    map.removeSource('highways');
+                }
+                
+                // Add source
+                map.addSource('highways', {
+                    type: 'geojson',
+                    data: geojson
+                });
+                
+                // Add layer
+                map.addLayer({
+                    id: 'highways-layer',
+                    type: 'line',
+                    source: 'highways',
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-color': '#FF0000', // Red for NH44
+                        'line-width': 4
+                    }
+                });
+                
+                console.log(`Loaded ${highways.length} NH44 segments from OSM (Hyderabad to Nagpur)`);
+                
+                // Add popup on click
+                map.on('click', 'highways-layer', (e) => {
+                    const features = map.queryRenderedFeatures(e.point, {
+                        layers: ['highways-layer']
+                    });
+                    
+                    if (features.length) {
+                        const feature = features[0];
+                        new maplibregl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(`<h3>${feature.properties.name}</h3><p>Reference: ${feature.properties.ref}</p>`)
+                            .addTo(map);
+                    }
+                });
+                
+                // Change cursor to pointer when hovering over highways
+                map.on('mouseenter', 'highways-layer', () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                });
+                
+                map.on('mouseleave', 'highways-layer', () => {
+                    map.getCanvas().style.cursor = '';
+                });
+                
+            } catch (error) {
+                console.error('Error loading OSM data:', error);
+                alert('Error loading OSM data: ' + error.message);
+            }
+        });
+        
+        // Add fit bounds functionality
+        document.getElementById('fitBounds').addEventListener('click', function() {
+            if (map.getSource('highways')) {
+                const bounds = new maplibregl.LngLatBounds();
+                
+                // Get the data and calculate bounds
+                const source = map.getSource('highways');
+                const data = source._data; // This is a workaround; in a real app you'd store the data separately
+                
+                if (data && data.features) {
+                    data.features.forEach(feature => {
+                        if (feature.geometry && feature.geometry.type === 'LineString' && feature.geometry.coordinates) {
+                            feature.geometry.coordinates.forEach(coord => {
+                                bounds.extend([coord[0], coord[1]]);
+                            });
+                        }
+                    });
+                    
+                    map.fitBounds(bounds, { padding: 50 });
+                }
+            }
+        });
+        
+        // Load data automatically when page loads
+        window.addEventListener('load', function() {
+            // Trigger the load after a short delay to allow map to initialize
+            setTimeout(() => {
+                document.getElementById('loadData').click();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
