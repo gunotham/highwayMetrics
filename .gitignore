@@ -35,6 +35,7 @@ highwaymetricBE/buildNumber.properties
 # VS Code
 highwaymetricBE/.vscode/
 highwaymetricBE/.DS_Store
+highwaymetricBE/gemini_chat.json
 
 # Context files
 highwaymetricBE/QWEN.md
