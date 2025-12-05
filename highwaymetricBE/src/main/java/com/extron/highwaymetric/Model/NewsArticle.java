@@ -1,48 +1,37 @@
 package com.extron.highwaymetric.Model;
 
 import java.time.LocalDateTime;
-
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "news_article")
+@EntityListeners(AuditingEntityListener.class)
 public class NewsArticle {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private String id;
 
-    private String title;
-    
-    @Column(name = "url", nullable = false, unique = true)
-    private String url;
+  private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "highway_id", nullable = false)
-    private Highway highway;
+  @Column(name = "url", nullable = false, unique = true)
+  private String url;
 
-    @Column(name = "published_at", nullable = false)
-    private LocalDateTime publishedAt;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "highway_id", nullable = false)
+  @JsonIgnore
+  private Highway highway;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "project_id", nullable = false)
+  @JsonIgnore
+  private Project project;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+  @Column(name = "published_at", nullable = false)
+  private LocalDateTime publishedAt;
 
-    @PrePersist
-    protected void onCreate(){
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate(){
-        updatedAt = LocalDateTime.now();
-    }
 }

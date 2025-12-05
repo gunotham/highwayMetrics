@@ -76,9 +76,22 @@ def extract_data_from_pdfs():
         }
     ])
 
-    # Clean the project names
+    # Clean the project names and extract chainage
     for project in all_projects:
         project["project_name"] = clean_text(project["project_name"])
+        
+        # Extract chainage if available
+        # Pattern: from km X to km Y
+        chainage_match = re.search(r'from\s+(?:design\s+)?km\.?\s*([\d\+\.]+)\s+to\s+(?:km\.?\s*)?([\d\+\.]+)', project["project_name"], re.IGNORECASE)
+        if chainage_match:
+            project['start_chainage'] = chainage_match.group(1)
+            project['end_chainage'] = chainage_match.group(2)
+        else:
+            # Pattern: at km X
+            at_km_match = re.search(r'at\s+(?:design\s+)?km\.?\s*([\d\+\.]+)', project["project_name"], re.IGNORECASE)
+            if at_km_match:
+                project['start_chainage'] = at_km_match.group(1)
+                project['end_chainage'] = at_km_match.group(1)
 
     with open('data_extraction/projects_metadata.json', 'w') as f:
         json.dump(all_projects, f, indent=4)
