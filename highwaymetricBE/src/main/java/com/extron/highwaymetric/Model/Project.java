@@ -59,7 +59,7 @@ public class Project {
 
   @ManyToOne
   @JoinColumn(name = "contractor_id")
-  private Contractor contractor;
+  private Contractor contractor
 
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
