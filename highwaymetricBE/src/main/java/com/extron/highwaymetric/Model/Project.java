@@ -36,10 +36,8 @@ public class Project {
   private String id;
 
   private String projectName;
-  private String nhNumber;
   private Double totalLength;
   private String lanes;
-  private String concessionaire;
   private String state;
 
   @JdbcTypeCode(SqlTypes.GEOMETRY)
@@ -51,6 +49,8 @@ public class Project {
 
   private LocalDate loaDate;
 
+  private LocalDate startDate;
+
   @ManyToMany( mappedBy = "projects", fetch = FetchType.LAZY)
   private List<Highway> highways;
 
@@ -59,7 +59,7 @@ public class Project {
 
   @ManyToOne
   @JoinColumn(name = "contractor_id")
-  private Contractor contractor
+  private Contractor contractor;
 
   @CreatedDate
   @Column(name = "created_at", nullable = false, updatable = false)
