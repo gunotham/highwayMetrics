@@ -91,3 +91,5 @@ highwaymetricFE/osm_nh44_test.json
 # Test output (optional)
 highwaymetricFE/coverage/
 
+highwaymetricBE/src/main/resources/application.properties
+highwaymetricBE/dummy.json
