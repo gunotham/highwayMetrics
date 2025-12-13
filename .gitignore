@@ -93,3 +93,4 @@ highwaymetricFE/coverage/
 
 highwaymetricBE/src/main/resources/application.properties
 highwaymetricBE/dummy.json
+highwaymetricBE/projects.json
